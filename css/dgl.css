@@ -1,0 +1,24 @@
+@font-face {
+    font-family: 'PixelMplus10';
+    src: url('./PixelMplus10-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+html,body{
+    min-height:100%;
+    max-height:100%;
+    margin:0px;
+    padding:0px;
+    overflow:hidden;
+    background-color:gray;
+}
+
+#frontbuffer{
+    min-height:100%;
+    max-height:100%;
+    width:100%;
+    height:100%;
+}
+#backbuffer{
+    display:none;
+}

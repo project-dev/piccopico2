@@ -1,0 +1,320 @@
+<!DOCTYPE>
+<html lang="ja">
+    <head>
+        <meta http-equiv="Content-Style-Type" content="text/css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta http-equiv="Content-Style-Type" content="text/css">
+        <meta http-equiv="Content-Script-Type" content="text/javascript">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <title>ピッコピコ！！２</title>
+        <link rel="stylesheet" href="./css/dgl.css?version=1.0.0.0">
+
+        <script src="./script/png/crc32.js?version=1.0.0.0"></script>
+        <!-- <script src="./script/png/zlib.min.js"></script> -->
+        <script src="./script/png/pako.js?version=1.0.0.0"></script>
+        
+        <script src="./script/png/png.js?version=1.0.0.0"></script>
+        <script src="./script/png/pngutil.js?version=1.0.0.0"></script>
+
+        <script src="./script/dgl.devel.js?version=1.0.0.0"></script>
+        <script src="./script/dgl.device.js?version=1.0.0.0"></script>
+        <script src="./script/dgl.audio.js?version=1.0.0.0"></script>
+        <script src="./script/dgl.core.js?version=1.0.0.0"></script>
+
+        <script src="./script/palette/palette_title.js?version=20250528_0000"></script>
+        <script src="./script/palette/palette_demo.js?version=20250528_0000"></script>
+
+        <script src="./script/scene_ready.js?version=20250528_0000"></script>
+        <script src="./script/scene_title.js?version=20250528_0000"></script>
+        <script src="./script/scene_demo.js?version=20250528_0001"></script>
+        <script src="./script/scene_main.js?version=20250528_0000"></script>
+        <script>
+    		'use strict';
+            LOG.isDebug = false;
+
+            // プレイモードの列挙型もどき
+            const PlayMode = Object.freeze({
+                normal:0x0000,
+                music:0x0001,
+                choucho:0xf0000,
+                sakura:0xf0001,
+                koujou:0xf0002,
+            });
+
+            // グローバル変数(管理クラスを作ってそこで管理さえたほうがいいんだけど)
+            let score = 0;
+            let hiscore = {
+                [PlayMode.normal]:0,
+                [PlayMode.choucho]:0,
+                [PlayMode.sakura]:0,
+                [PlayMode.koujou]:0,
+            };
+            let playMode = PlayMode.normal;
+            const COLOR_SIZE = 3;
+
+            document.addEventListener('DOMContentLoaded', function() {
+
+                try{
+                    dglInitalize(null, 'gba');
+
+                    // イメージのロード。非同期で読み込む
+                    Promise.all([
+                        loadPng("./img/music_mode_bg.png"),
+                        loadPng("./img/images01.png"),
+                        loadPng("./img/demo_song.png"),
+                        loadPng("./img/demo_song2.png"),
+                        loadPng("./img/demo_song3.png"),
+                        loadPng("./img/demo_song4.png"),
+                        loadPng("./img/demo_bg_1.png"),
+
+                        // silentはいずれフレームワーク内で処理させるようにしたい
+                        // そもそも、silent.mp3で鳴らす必要があるのだろうか？
+                        // 適当にバッファ作って鳴らすようにしたほうがいいかも
+                        dglAudio.loadSound("silent", "./sound/silent.mp3"),
+                        dglAudio.loadSound("piko01", "./sound/piko01.mp3"),
+                        dglAudio.loadSound("piko02", "./sound/piko02.mp3"),
+                        dglAudio.loadSound("ready", "./sound/ready.mp3"),
+                        dglAudio.loadSound("go", "./sound/go.mp3"),
+                        dglAudio.loadSound("finish", "./sound/finish.mp3"),
+                        dglAudio.loadSound("bgm01", "./sound/bgm01.mp3"),
+                        dglAudio.loadSound("themesong", "./sound/themesong.mp3"),
+
+                        dglAudio.loadSound("C2", "./sound/tone/c_2.mp3"),
+                        dglAudio.loadSound("C#2", "./sound/tone/cs2.mp3"),
+                        dglAudio.loadSound("D2", "./sound/tone/d_2.mp3"),
+                        dglAudio.loadSound("D#2", "./sound/tone/ds2.mp3"),
+                        dglAudio.loadSound("Eb2", "./sound/tone/ds2.mp3"),
+                        dglAudio.loadSound("E2", "./sound/tone/e_2.mp3"),
+                        dglAudio.loadSound("F2", "./sound/tone/f_2.mp3"),
+                        dglAudio.loadSound("F#2", "./sound/tone/fs2.mp3"),
+                        dglAudio.loadSound("G2", "./sound/tone/g_2.mp3"),
+                        dglAudio.loadSound("G#2", "./sound/tone/gs2.mp3"),
+                        dglAudio.loadSound("A2", "./sound/tone/a_2.mp3"),
+                        dglAudio.loadSound("A#2", "./sound/tone/as2.mp3"),
+                        dglAudio.loadSound("Bb2", "./sound/tone/as2.mp3"),
+                        dglAudio.loadSound("B2", "./sound/tone/b_2.mp3"),
+
+                        dglAudio.loadSound("C3", "./sound/tone/c_3.mp3"),
+                        dglAudio.loadSound("C#3", "./sound/tone/cs3.mp3"),
+                        dglAudio.loadSound("D3", "./sound/tone/d_3.mp3"),
+                        dglAudio.loadSound("D#3", "./sound/tone/ds3.mp3"),
+                        dglAudio.loadSound("Eb3", "./sound/tone/ds3.mp3"),
+                        dglAudio.loadSound("E3", "./sound/tone/e_3.mp3"),
+                        dglAudio.loadSound("F3", "./sound/tone/f_3.mp3"),
+                        dglAudio.loadSound("F#3", "./sound/tone/fs3.mp3"),
+                        dglAudio.loadSound("G3", "./sound/tone/g_3.mp3"),
+                        dglAudio.loadSound("G#3", "./sound/tone/gs3.mp3"),
+                        dglAudio.loadSound("A3", "./sound/tone/a_3.mp3"),
+                        dglAudio.loadSound("A#3", "./sound/tone/as3.mp3"),
+                        dglAudio.loadSound("Bb3", "./sound/tone/as3.mp3"),
+                        dglAudio.loadSound("B3", "./sound/tone/b_3.mp3"),
+
+                        dglAudio.loadSound("C4", "./sound/tone/c_4.mp3"),
+                        dglAudio.loadSound("C#4", "./sound/tone/cs4.mp3"),
+                        dglAudio.loadSound("D4", "./sound/tone/d_4.mp3"),
+                        dglAudio.loadSound("D#4", "./sound/tone/ds4.mp3"),
+                        dglAudio.loadSound("Eb4", "./sound/tone/ds4.mp3"),
+                        dglAudio.loadSound("E4", "./sound/tone/e_4.mp3"),
+                        dglAudio.loadSound("F4", "./sound/tone/f_4.mp3"),
+                        dglAudio.loadSound("F#4", "./sound/tone/fs4.mp3"),
+                        dglAudio.loadSound("G4", "./sound/tone/g_4.mp3"),
+                        dglAudio.loadSound("G#4", "./sound/tone/gs4.mp3"),
+                        dglAudio.loadSound("A4", "./sound/tone/a_4.mp3"),
+                        dglAudio.loadSound("A#4", "./sound/tone/as4.mp3"),
+                        dglAudio.loadSound("Bb4", "./sound/tone/as4.mp3"),
+                        dglAudio.loadSound("B4", "./sound/tone/b_4.mp3"),
+                       
+                    ]).then((results) =>{
+                        results.forEach(result => {
+                            if(result != undefined){
+                                dglMain.imageMap[result.name] = result;
+                                if(result.name == "images01"){
+                                    LOG.info("パレット登録");
+                                    dglMain.png.palette = dglMain.imageMap[result.name].plte;
+                                    dglMain.png.trans = dglMain.imageMap[result.name].trns;
+                                    dglMain.png.systemPalette = dglMain.png.palette;
+
+                                    pngBackBuffer.defPalette = dglMain.png.palette;
+                                    pngBackBuffer.defTrans = dglMain.png.trans;
+                                }
+                            }
+                        });
+
+                        //----------------------------------------------------
+                        // タイトル前
+                        //----------------------------------------------------
+                        setCDSData(99,  0, "images01",   32, 120,  51,   8);
+
+                        //----------------------------------------------------
+                        // タイトルなど
+                        //----------------------------------------------------
+                        // タイトル
+                        setCDSData(0,   0, "images01",   32,   0, 184,  40);
+                        // READY
+                        setCDSData(0,   1, "images01",   32,  48,  76,  24);
+                        // GO
+                        setCDSData(0,   2, "images01",   32,  72,  82,  24);
+                        // FINISH
+                        setCDSData(0,   3, "images01",   32,  96,  91,  24);
+                        // Normal
+                        setCDSData(0,   4, "images01",  112,  48,  39,   8);
+                        // Music
+                        setCDSData(0,   5, "images01",  112,  56,  28,   8);
+                        // チョウチョ
+                        setCDSData(0,   6, "images01",  120,  64,  47,   8);
+                        // サクラ
+                        setCDSData(0,   7, "images01",  120,  72,  47,   8);
+                        // 荒城の月
+                        setCDSData(0,   8, "images01",  120,  80,  47,   8);
+
+                        //----------------------------------------------------
+                        // デモソング
+                        //----------------------------------------------------
+                        // 神が与えしその狂気
+                        setCDSData(80,   0, "demo_song",  0,   0, 144,  16);
+                        // 子供の瞳光り出す
+                        setCDSData(80,   1, "demo_song",  0,  16, 144,  16);
+                        // 無慈悲に振り降ろされた
+                        setCDSData(80,   2, "demo_song",  0,  32, 176,  16);
+                        // 鳴り響く　ピコピコと！
+                        setCDSData(80,   3, "demo_song",  0,  48, 160,  16);
+                        // (PICO!PICO!PICO!)
+                        setCDSData(80,   4, "demo_song",  0,  64, 160,  16);
+                        // 覚悟しろ！出てきたところ叩いてやる
+                        setCDSData(80,   5, "demo_song",  0,  80, 192,  32);
+                        // (PICO!PICO!PICO!)
+                        setCDSData(80,   6, "demo_song",  0,  64, 160,  16);
+                        // ヘルメット かぶる前に仕留めてやる
+                        setCDSData(80,   7, "demo_song",  0, 112, 192,  32);
+                        // 俺のピコピコハンマー
+                        setCDSData(80,   8, "demo_song",  0, 144, 160,  16);
+
+                        // 神が与えしその狂気(背景)
+                        setCDSData(100,  0, "demo_bg_1",  0,   0, 240, 160);
+
+                        // 前奏待ってね
+                        setCDSData(81,   0, "demo_song",192,   0, 200, 152);
+                        // ピ神本体
+                        setCDSData(81,   1, "demo_song2",  0,  0, 240, 160);
+                        // ピ神左手
+                        setCDSData(81,   2, "demo_song2", 80,168,  64,  88);
+                        // ピ神右手
+                        setCDSData(81,   3, "demo_song2",152,168,  88,  64);
+                        // ハンマー
+                        setCDSData(81,   4, "demo_song2",  0,160,  80, 104);
+
+                        // 子供1
+                        setCDSData(81,   5, "demo_song4",  0,  0,  72,  80,  36,  80);
+
+                        // 子供2
+                        setCDSData(81,   6, "demo_song4", 72,  0,  56,  80,  28,  80);
+
+
+                        // ピ
+                        setCDSData(81,   7, "demo_song",    0, 160,  40,  40, 0, 0);
+
+                        // コ
+                        setCDSData(81,   8, "demo_song",   40, 160,  40,  40, 0, 0);
+
+
+                        // ピコピコハンマー 左向き 縦
+                        setCDSData(85,   0, "demo_song3",  0,   0,  64,  88, 32, 88);
+
+                        // ピコピコハンマー 左向き 横
+                        setCDSData(85,   1, "demo_song3", 64,   0,  88,  64,  0, 32);
+
+                        // ピコピコハンマー 右向き 縦
+                        setCDSData(85,   2, "demo_song3",  0,  88,  64,  88, 32, 88);
+
+                        // ピコピコハンマー 右向き 横
+                        setCDSData(85,   3, "demo_song3", 64,  88,  88,  64, 88, 32);
+
+                        //----------------------------------------------------
+                        // マップ用
+                        //----------------------------------------------------
+                        // 草ブロック
+                        setCDSData(1,   0, "images01",   0,   0,   8,   8);
+                        // 岩ブロック
+                        setCDSData(1,   1, "images01",   8,   0,   8,   8);
+
+                        // ターゲット１
+                        setCDSData(3,   0, "images01",   0,  48,  16,  16);
+                        setCDSData(3,   1, "images01",   0,  64,  16,  16);
+                        setCDSData(3,   2, "images01",   0,  80,  16,  16);
+                        setCDSData(3,   3, "images01",   0,  96,  16,  16);
+                        setCDSData(3,   4, "images01",   0, 112,  16,  16);
+                        setCDSData(3,   5, "images01",   0,  96,  16,  16);
+                        setCDSData(3,   6, "images01",   0,  80,  16,  16);
+                        setCDSData(3,   7, "images01",   0,  64,  16,  16);
+                        setCDSData(3,   8, "images01",   0,  48,  16,  16);
+
+                        setCDSData(4,   0, "images01",  16,  48,  16,  16);
+                        setCDSData(4,   1, "images01",  16,  64,  16,  16);
+                        setCDSData(4,   2, "images01",  16,  80,  16,  16);
+                        setCDSData(4,   3, "images01",  16,  96,  16,  16);
+                        setCDSData(4,   4, "images01",  16, 112,  16,  16);
+                        setCDSData(4,   5, "images01",  16,  96,  16,  16);
+                        setCDSData(4,   6, "images01",  16,  80,  16,  16);
+                        setCDSData(4,   7, "images01",  16,  64,  16,  16);
+                        setCDSData(4,   8, "images01",  16,  48,  16,  16);
+
+                        // パーティカル
+                        setCDSData(20,   0, "images01",   16,   0,  16,  16);
+                        setCDSData(20,   1, "images01",   16,  16,  16,  16);
+                        setCDSData(20,   2, "images01",   16,  32,  16,  16);
+
+                        // パーティカル
+                        setCDSData(21,   0, "images01",  216,   0,  16,  16);
+                        setCDSData(21,   1, "images01",  216,  16,  16,  16);
+                        setCDSData(21,   2, "images01",  216,  32,  16,  16);
+
+                        // 音楽モード
+                        setCDSData(50,   1, "music_mode_bg",  0,  0,  240,  160);
+
+
+                        //----------------------------------------------------
+                        // 画面上部情報
+                        //----------------------------------------------------
+
+
+                        // SCORE 26 + 6 + 6 * 4
+                        setCDSData(90,   0, "images01",  32,  40,  26,   8);
+
+                        // HISCORE 36 + 6 + 6 * 4
+                        setCDSData(90,   1, "images01", 144,  40,  36,   8);
+
+                        // TIME 21 + 6 + 6 * 2
+                        setCDSData(90,   2, "images01", 184,  40,  21,   8);
+
+                        // 数字
+                        setCDSData(91,   0, "images01",  65,  40,   6,   8);
+                        setCDSData(91,   1, "images01",  73,  40,   6,   8);
+                        setCDSData(91,   2, "images01",  81,  40,   6,   8);
+                        setCDSData(91,   3, "images01",  89,  40,   6,   8);
+                        setCDSData(91,   4, "images01",  97,  40,   6,   8);
+                        setCDSData(91,   5, "images01", 105,  40,   6,   8);
+                        setCDSData(91,   6, "images01", 113,  40,   6,   8);
+                        setCDSData(91,   7, "images01", 121,  40,   6,   8);
+                        setCDSData(91,   8, "images01", 129,  40,   6,   8);
+                        setCDSData(91,   9, "images01", 137,  40,   6,   8);
+
+                        scene_ready_register();
+                        scene_title_register();
+                        scene_demo_register();
+                        scene_main_register();
+
+                        dglStart();
+                        sceneChange("ready");
+                    }).catch(reject =>{
+                        LOG.error(reject);
+                    });
+                }catch(e){
+                    LOG.error(e);
+                    alert(e);
+                }
+            });
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
