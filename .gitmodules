@@ -1,3 +1,6 @@
 [submodule "script/paperang"]
 	path = script/paperang
 	url = https://github.com/project-dev/paperang_js.git
+[submodule "script/png"]
+	path = script/png
+	url = https://github.com/project-dev/pngpalette.git
