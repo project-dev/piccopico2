@@ -226,7 +226,7 @@ function scene_title_register(){
                         if(musicX <= px && px <= musicX + 48 &&
                             (modeY + (8 + 1) * 3 ) <= py && py <=  (modeY + (8 + 1) * 3 ) + 40
                         ){
-                            playMode = PlayMode.koujo;
+                            playMode = PlayMode.koujou;
                             dglAudio.playSound("piko01");
                             sceneChange("main");
                         }

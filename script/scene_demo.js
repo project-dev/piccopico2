@@ -53,6 +53,7 @@ function scene_demo_register(){
         mvObject.leftThunderCount = 0;
         mvObject.rightThunderCount = 150;
         mvObject.eyeCount = 0;
+        mvObject.titleAnimeCount = 0;
     }
 
     /**
@@ -84,6 +85,15 @@ function scene_demo_register(){
             if(elapsed >= 5.430){
                 putSpritePNG(dglObj.demoPutTblNo, 8, 160, 72);
             }
+
+            dglObj.titleAnimeCount++;
+            let picopico_plt = scene_title_palette['title'];
+            let titlePaletteIndex = Math.floor(dglObj.titleAnimeCount / 5);
+            if(dglObj.titleAnimeCount >= 5 * (picopico_plt.length)){
+                dglObj.titleAnimeCount = 0;
+                titlePaletteIndex = 0;
+            }
+            pngBackBuffer.palette.set(picopico_plt[titlePaletteIndex], 16 * 3 * COLOR_SIZE);
 
         }else if(elapsed <= 12.76){
             // 神が与えしこの狂気
@@ -165,6 +175,15 @@ function scene_demo_register(){
             if(elapsed >= 30.283){
                 putSpritePNG(dglObj.demoPutTblNo, 8, 160, 72);
             }
+
+            dglObj.titleAnimeCount++;
+            let picopico_plt = scene_title_palette['title'];
+            let titlePaletteIndex = Math.floor(dglObj.titleAnimeCount / 5);
+            if(dglObj.titleAnimeCount >= 5 * picopico_plt.length){
+                dglObj.titleAnimeCount = 0;
+                titlePaletteIndex = 0;
+            }
+            pngBackBuffer.palette.set(picopico_plt[titlePaletteIndex], 16 * 3 * COLOR_SIZE);
 
         }else if(elapsed <= 32.745){
             // ピコピコ
