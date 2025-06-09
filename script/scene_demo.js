@@ -54,6 +54,8 @@ function scene_demo_register(){
         mvObject.rightThunderCount = 150;
         mvObject.eyeCount = 0;
         mvObject.titleAnimeCount = 0;
+        mvObject.pikoPos = [];
+        mvObject.pikoCnt = 0;
     }
 
     /**
@@ -155,6 +157,27 @@ function scene_demo_register(){
 
         }else if(elapsed <= 29.436){
             // 鳴り響くピコピコと
+            mvObject.pikoCnt++;
+            if(mvObject.pikoCnt % 5 == 0){
+                let pikoX = Math.floor(Math.random() * (backBuffer.width / 2 - 24));
+                let pikoY = Math.floor(Math.random() * (backBuffer.height / 2 - 16));
+                mvObject.pikoPos.push({'x':pikoX, 'y':pikoY});
+
+                pikoX = Math.floor(Math.random() * (backBuffer.width / 2 - 24)) + backBuffer.width / 2;
+                pikoY = Math.floor(Math.random() * (backBuffer.height / 2 - 16));
+                mvObject.pikoPos.push({'x':pikoX, 'y':pikoY});
+
+                pikoX = Math.floor(Math.random() * (backBuffer.width / 2 - 24));
+                pikoY = Math.floor(Math.random() * (backBuffer.height / 2 - 16)) + backBuffer.height / 2;
+                mvObject.pikoPos.push({'x':pikoX, 'y':pikoY});
+
+                pikoX = Math.floor(Math.random() * (backBuffer.width / 2 - 24)) + backBuffer.width / 2;
+                pikoY = Math.floor(Math.random() * (backBuffer.height / 2 - 16)) + backBuffer.height / 2;
+                mvObject.pikoPos.push({'x':pikoX, 'y':pikoY});
+            }
+            mvObject.pikoPos.forEach(pos => {
+                putSpritePNG(dglObj.demoPutTblNo, 9, pos.x, pos.y);
+            });
 
             // -- 歌詞 ------
             let sonWidth = getCDS(dglObj.songPutTblNo, 3).width;

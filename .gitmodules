@@ -1,6 +1,9 @@
-[submodule "script/paperang"]
-	path = script/paperang
-	url = https://github.com/project-dev/paperang_js.git
-[submodule "script/png"]
-	path = script/png
+[submodule "lib/dgl"]
+	path = lib/dgl
+	url = https://github.com/project-dev/dgl.js.git
+[submodule "lib/png"]
+	path = lib/png
 	url = https://github.com/project-dev/pngpalette.git
+[submodule "lib/paperang"]
+	path = lib/paperang
+	url = https://github.com/project-dev/paperang_js.git
