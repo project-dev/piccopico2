@@ -52,6 +52,14 @@ function scene_title_register(){
             107, 107, 107,
             107, 107, 107,
         ]);
+
+        // 最後のプレイがMusicの場合の対応
+        if((playMode & 0xf000) == 0xf000){
+            playMode = PlayMode.music;
+        }else{
+            playMode = PlayMode.normal;
+        }
+
     }
     
     // タイトルメイン処理
