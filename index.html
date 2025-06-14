@@ -64,7 +64,9 @@
                         loadPng("./img/demo_song2.png"),
                         loadPng("./img/demo_song3.png"),
                         loadPng("./img/demo_song4.png"),
+                        loadPng("./img/demo_song5.png"),
                         loadPng("./img/demo_bg_1.png"),
+                        loadPng("./img/demo_bg_3.png"),
 
                         // silentはいずれフレームワーク内で処理させるようにしたい
                         // そもそも、silent.mp3で鳴らす必要があるのだろうか？
@@ -216,6 +218,17 @@
 
                         // ピコ
                         setCDSData(81,   9, "demo_song4",  0, 80,  24,  16,   0,   0);
+
+
+                        // 恐怖するモグラの本体
+                        setCDSData(82,   0, "demo_song5",  0,   0, 135, 143, 68,  0);
+
+                        // 恐怖するモグラの目
+                        setCDSData(82,   1, "demo_song5",136,   0,  56,  32, 28,  0);
+                        setCDSData(82,   2, "demo_song5",136,  32,  56,  32, 28,  0);
+                        setCDSData(82,   3, "demo_song5",136,  64,  56,  32, 28,  0);
+
+                        setCDSData(82,   9, "demo_bg_3",   0,   0, 240, 160,  0,  0);
 
                         // ピコピコハンマー 左向き 縦
                         setCDSData(85,   0, "demo_song3",  0,   0,  64,  88, 32, 88);

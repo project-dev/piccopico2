@@ -56,6 +56,7 @@ function scene_demo_register(){
         mvObject.titleAnimeCount = 0;
         mvObject.pikoPos = [];
         mvObject.pikoCnt = 0;
+        mvObject.mogCount = 0;
     }
 
     /**
@@ -233,6 +234,36 @@ function scene_demo_register(){
 
         }else if(elapsed <= 37.048){
             // 覚悟しろ出てきたとこ叩いてやる
+
+            // 背景
+            putSpritePNG(82, 9, 0, 0);
+
+            // モグラ本体
+            let mogx = Math.floor(backBuffer.width / 2);
+            let mogy = 24;
+            putSpritePNG(82, 0, mogx, mogy);
+
+            // 瞳のアニメ
+            let mogEyePutNo = Math.floor(dglObj.mogCount / 10 % 3 + 1);
+            putSpritePNG(82, mogEyePutNo, mogx + 8, mogy + 16);
+
+            // パレット操作
+            let mog_plt = scene_demo_palette['mog'];
+            if(elapsed <= 33.000){
+                pngBackBuffer.palette.set(mog_plt[0], (16 * 6 + 7) * COLOR_SIZE);
+            }else if(elapsed <= 33.300){
+                pngBackBuffer.palette.set(mog_plt[1], (16 * 6 + 7) * COLOR_SIZE);
+            }else if(elapsed <= 33.600){
+                pngBackBuffer.palette.set(mog_plt[2], (16 * 6 + 7) * COLOR_SIZE);
+            }else if(elapsed <= 33.900){
+                pngBackBuffer.palette.set(mog_plt[3], (16 * 6 + 7) * COLOR_SIZE);
+            }else if(elapsed <= 34.200){
+                pngBackBuffer.palette.set(mog_plt[4], (16 * 6 + 7) * COLOR_SIZE);
+            }else{
+                pngBackBuffer.palette.set(mog_plt[5], (16 * 6 + 7) * COLOR_SIZE);
+            }
+
+            dglObj.mogCount++;
 
             // -- 歌詞 ------
             let sonWidth = getCDS(dglObj.songPutTblNo, 5).width;
