@@ -57,6 +57,19 @@ function scene_demo_register(){
         mvObject.pikoPos = [];
         mvObject.pikoCnt = 0;
         mvObject.mogCount = 0;
+
+        // パート：無慈悲に振り下ろされた
+        mvObject.hx = [];
+        mvObject.hy = [];
+        mvObject.addCnt = [];
+        mvObject.downCnt = [];
+        let downWidth = Math.floor((backBuffer.width - 88)/ 5);
+        for(var i = 0; i < 5; i++){
+            mvObject.hx[i] = Math.floor(Math.random() * downWidth) + (downWidth * (i + 1)) + 88;
+            mvObject.hy[i] = Math.floor(Math.random() * 64 + 32) * -1;
+            mvObject.addCnt[i] = Math.floor(Math.random() * 5) + 1;
+            mvObject.downCnt[i] = 0;
+        }
     }
 
     /**
@@ -150,6 +163,11 @@ function scene_demo_register(){
 
         }else if(elapsed <= 25.07){
             // 無慈悲に振り降ろされた
+            for(var i = 0; i < 5; i++){
+                let z = Math.floor(mvObject.downCnt[i] / 3);
+                putSpritePNG(85, 3, mvObject.hx[i], mvObject.hy[i] + z);
+                mvObject.downCnt[i] += mvObject.addCnt[i];
+            }
 
             // -- 歌詞 ------
             let sonWidth = getCDS(dglObj.songPutTblNo, 2).width;

@@ -19,7 +19,7 @@ function scene_title_register(){
     title.initalize = (dglObj, sceneObject)=>{
         dglObj.titleAnimeCount = 0;
         dglObj.titlePalette = scene_title_palette['title'];
-        dglObj.stratTime = Date.now();
+        dglObj.startTime = Date.now();
     }
 
     // ハイスコアを初期化
@@ -82,7 +82,8 @@ function scene_title_register(){
         }
 
         // 30秒経ったら、デモへ遷移
-        if (Date.now() - dglObj.stratTime >= 30_000) {
+        if (Date.now() - dglObj.startTime >= 30_000) {
+        //if (Date.now() - dglObj.startTime >= 5_000) {
             sceneChange("demo");
         }
     }
