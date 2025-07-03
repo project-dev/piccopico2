@@ -82,8 +82,8 @@ function scene_title_register(){
         }
 
         // 30秒経ったら、デモへ遷移
-        if (Date.now() - dglObj.startTime >= 30_000) {
-        //if (Date.now() - dglObj.startTime >= 5_000) {
+        //if (Date.now() - dglObj.startTime >= 30_000) {
+        if (Date.now() - dglObj.startTime >= 5_000) {
             sceneChange("demo");
         }
     }

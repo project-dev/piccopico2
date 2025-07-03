@@ -57,6 +57,9 @@ function scene_demo_register(){
         mvObject.pikoPos = [];
         mvObject.pikoCnt = 0;
         mvObject.mogCount = 0;
+        mvObject.manX = Math.floor(backBuffer.width / 3 * 2);
+        mvObject.helmeX = 0;
+        mvObject.manCount = 0;
 
         // パート：無慈悲に振り下ろされた
         mvObject.hx = [];
@@ -313,6 +316,15 @@ function scene_demo_register(){
 
         }else if(elapsed <= 43.378){
             // ヘルメット　かぶる前に仕留めてやる
+
+            if(mvObject.manCount % 3 == 0){
+                mvObject.manX--;
+                mvObject.helmeX++;
+            }
+            mvObject.manCount++;
+
+            putSpritePNG(86, 1,  mvObject.manX, Math.floor(backBuffer.height / 2));
+            putSpritePNG(86, 0,  mvObject.helmeX, backBuffer.height);
 
             // -- 歌詞 ------
             let sonWidth = getCDS(dglObj.songPutTblNo, 7).width;
